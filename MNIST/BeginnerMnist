@@ -1,0 +1,61 @@
+import tensorflow as tf
+from time import time
+from tensorflow.python.keras.callbacks import TensorBoard
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+mnist = tf.keras.datasets.mnist
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(input_shape=(28, 28)),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+tensorboard = TensorBoard(log_dir="logsQS\{}".format(time()))
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+model.fit(x_train, y_train, epochs=5, callbacks=[tensorboard])
+model.evaluate(x_test, y_test, verbose=2)
+
+IMG_SIZE = 28
+img4 = cv2.imread(r'1.png', cv2.IMREAD_UNCHANGED)
+img4 = img4[:, :, 3]
+img4 = cv2.resize(img4, (IMG_SIZE, IMG_SIZE))
+img4 = img4 / 255.0
+
+img1 = cv2.imread(r'2.png', cv2.IMREAD_UNCHANGED)
+img1 = img1[:, :, 3]
+img1 = cv2.resize(img1, (IMG_SIZE, IMG_SIZE))
+img1 = img1 / 255.0
+
+img2 = cv2.imread(r'3.png', cv2.IMREAD_UNCHANGED)
+img2 = img2[:, :, 3]
+img2 = cv2.resize(img2, (IMG_SIZE, IMG_SIZE))
+img2 = img2 / 255.0
+
+img3 = cv2.imread(r'5.png', cv2.IMREAD_UNCHANGED)
+img3 = img3[:, :, 3]
+img3 = cv2.resize(img3, (IMG_SIZE, IMG_SIZE))
+img3 = img3 / 255.0
+
+
+def LoadImage(image):
+    img = cv2.imread(image, cv2.IMREAD_UNCHANGED)
+    try:
+        img = img[:, :, 3]
+    except:
+        pass
+    img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+    img = img / 255.0
+    print(model.predict_classes([np.array([img])]))
+
+
+
+images = np.array([img1, img2, img3, img4])
+print(model.predict_classes([images]))
+
